@@ -1,0 +1,61 @@
+correct category: 4
+                            
+                            
+                            
+                            
+                            
+          XXX         X     
+         XXX         XXX    
+        XXX         XXX     
+       XXX         XXX      
+       XXX        XXXX      
+      XXX         XXX       
+      XXX        XXX        
+      XXXXXXXXXXXXXX        
+      XXXXXXXXXXXXXX        
+        XXXXXXXXXXX         
+               XXX          
+               XXX          
+              XXXX          
+              XXX           
+              XXX           
+             XXX            
+             XXX  X         
+             XXXXXX         
+             XXXXXX         
+             XXX            
+                            
+                            
+                            
+
+
+squashed hidden layer 0.949295
+squashed hidden layer 0.999604
+squashed hidden layer 0.000117972
+squashed hidden layer 0.776046
+squashed hidden layer 0.994766
+squashed hidden layer 0.621067
+squashed hidden layer 0.796164
+squashed hidden layer 0.000287063
+squashed hidden layer 0.00484347
+squashed hidden layer 0.957152
+squashed output layer 0.805477
+squashed output layer 0.801368
+squashed output layer 0.935374
+squashed output layer 0.287821
+squashed output layer 0.624157
+errors in output -0.126205
+errors in output -0.12756
+errors in output -0.0565429
+errors in output -0.0589975
+errors in output -0.146418
+errors in hidden layer 3.78778e+06
+errors in hidden layer 188974
+errors in hidden layer 84681.6
+errors in hidden layer -1.02023e+08
+errors in hidden layer -573820
+errors in hidden layer 4.43114e+07
+errors in hidden layer -5.6379e+06
+errors in hidden layer 66694.6
+errors in hidden layer -558019
+errors in hidden layer -1.94579e+06
