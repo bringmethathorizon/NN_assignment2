@@ -5,13 +5,14 @@
 
 #define numOfInputNodes 785
 #define numOfOutputNodes 785
-#define numOfEpochs 5
 #define numOfHiddenLayers 11
-#define epochs 10
+#define epochs 1000
 
 
 void outputCalculation(float outputLayer[], float inputLayer[], float weightsContainer[], int inputLayerSize,
                        int outputLayerSize);
+
+float calcAverageError (float target[], float outputContainer[], int length);
 
 void outputFromInput(float outputLayer[], int inputLayer[], float weightsContainer[], int inputLayerSize,
                      int outputLayerSize);
@@ -38,7 +39,7 @@ int inputArr[numOfInputNodes];
 int main(int argc, char *argv[]) {
 
     seed_randoms();
-    float sampNoise = rand_frac() / 2.0; // sets default sampNoise
+    float sampNoise = 0; // sets default sampNoise
 
     // --- a simple example of how to set params from the command line
     if (argc == 2) { // if an argument is provided, it is SampleNoise
@@ -67,7 +68,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    float learningRate = 0.1;
+    float learningRate = 0.01;
 
     //    int pictureLabel = 6;
 
@@ -114,35 +115,17 @@ int main(int argc, char *argv[]) {
 
     //training
 
-    for (int ep = 0; ep < 5; ep++) {
+    for (int ep = 0; ep < epochs; ep++) {
 
         //testing
-//        cout << "TESTING" << endl;
-//
-//        for (int picIndex = 0; picIndex < sizeData; picIndex++) {
-//
-//            get_input(inputArr, zData, picIndex, sampNoise);
-//
-//            createTarget(target, inputArr, zData[picIndex].label);
-//
-//            outputFromInput(hiddenLayerArr, inputArr, weightsInputHidden, numOfInputNodes, numOfHiddenLayers);
-//            squashingFunction(hiddenLayerArr, numOfHiddenLayers);
-//
-//            hiddenLayerArr[0] = 1;
-//
-//            outputCalculation(outputArr, hiddenLayerArr, weightsHiddenOutput, numOfHiddenLayers, numOfOutputNodes);
-//            squashingFunction(outputArr, numOfOutputNodes);
-//
-//
-//        }
 
-        //learning
+        float sum = 0;
 
-        for (int pic = 0; pic < sizeData2; pic++) {
+        for (int picIndex = 0; picIndex < sizeData; picIndex++) {
 
-            get_input(inputArr, zData2, pic, sampNoise);
+            get_input(inputArr, zData, picIndex, sampNoise);
 
-            createTarget(target, inputArr, zData[pic].label);
+            createTarget(target, inputArr, zData[picIndex].label);
 
             outputFromInput(hiddenLayerArr, inputArr, weightsInputHidden, numOfInputNodes, numOfHiddenLayers);
             squashingFunction(hiddenLayerArr, numOfHiddenLayers);
@@ -152,15 +135,47 @@ int main(int argc, char *argv[]) {
             outputCalculation(outputArr, hiddenLayerArr, weightsHiddenOutput, numOfHiddenLayers, numOfOutputNodes);
             squashingFunction(outputArr, numOfOutputNodes);
 
+            convertIntToFloat(inputLayerArr, inputArr, numOfInputNodes);
+
+            sum += calcAverageError(inputLayerArr, outputArr, numOfOutputNodes);
+
+
+
+//            cout << "AVERAGE ERROR" << calcAverageError(inputLayerArr, outputArr, numOfOutputNodes) << endl;
+
+//            cout << "Number on picture = " << zData[picIndex].label << endl;
 //            drawTestOutput(outputArr);
+
+        }
+        cout << sum/sizeData << endl;
+
+        //learning
+
+        for (int pic = 0; pic < sizeData2; pic++) {
+
+            get_input(inputArr, zData2, pic, sampNoise);
+//            draw_input(inputArr, zData2[pic].label);
+
+            createTarget(target, inputArr, zData2[pic].label);
+
+            outputFromInput(hiddenLayerArr, inputArr, weightsInputHidden, numOfInputNodes, numOfHiddenLayers);
+            squashingFunction(hiddenLayerArr, numOfHiddenLayers);
+
+            hiddenLayerArr[0] = 1;
+
+            outputCalculation(outputArr, hiddenLayerArr, weightsHiddenOutput, numOfHiddenLayers, numOfOutputNodes);
+            squashingFunction(outputArr, numOfOutputNodes);
 
             calculateErrorForOutput(outputErrors, target, outputArr, numOfOutputNodes);
 
             calculateErrorForHidden(hiddenErrors, outputErrors, weightsHiddenOutput, hiddenLayerArr, numOfHiddenLayers,
                                     numOfOutputNodes);
 
+            convertIntToFloat(inputLayerArr, inputArr, numOfInputNodes);
+
             weightsUpdate(weightsHiddenOutput, numOfOutputNodes, numOfHiddenLayers, hiddenLayerArr, outputErrors,
                           learningRate);
+//            void weightsUpdate(float weightContainer[], int rows, int cols, float layer[], float error[], float learningRate)
 
             weightsUpdate(weightsInputHidden, numOfHiddenLayers, numOfInputNodes, inputLayerArr, hiddenErrors,
                           learningRate);
@@ -177,6 +192,9 @@ void createTarget(float target[], int container[], int numberOnPicture) {
     for (int i = 0; i < numOfOutputNodes; i++) {
         target[i] = (float) container[i];
     }
+
+    target[0] = (numberOnPicture % 2 == 0) ? 1 : 0;
+//    cout << "target[0] = " << target[0] << endl;
 }
 
 //multiplying weights with nodes(hidden --> input)
@@ -245,14 +263,14 @@ void weightsUpdate(float weightContainer[], int rows, int cols, float layer[], f
 
     float deltaWeightArray[rows * cols];
 
-    for (int i = 0; i < 785; i++) {
-        for (int j = 0; j < 10; j++) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
 
             deltaWeightArray[i * cols + j] = error[i] * layer[j] * learningRate;
 
             weightContainer[i * cols + j] += deltaWeightArray[i * cols + j];
 
-            cout << "weightContainer[" << i << "][" << j << "] = "  << weightContainer[i] << endl;
+//            cout << "weightContainer[" << i << "][" << j << "] = "  << weightContainer[i] << endl;
         }
     }
 }
@@ -269,7 +287,7 @@ void drawTestOutput(float outputArr[]) {
     for (int i = 0; i < 28; i++) {
         for (int j = 0; j < 28; j++) {
 
-            if ((outputArr[i * 28] + j + 1) >= 0.5) {
+            if (outputArr[i * 28 + j + 1] >= 0.5) {
                 cout << "X";
             } else {
                 cout << " ";
@@ -279,4 +297,14 @@ void drawTestOutput(float outputArr[]) {
     }
 
     cout << endl;
+}
+
+float calcAverageError (float target[], float outputContainer[], int length) {
+    float sumOfErrors = 0;
+    for(int i = 0; i < length; i++){
+        float diff = fabs(target[i] - outputContainer[i]);
+        sumOfErrors+=diff;
+    }
+    return sumOfErrors/length;
+
 }
