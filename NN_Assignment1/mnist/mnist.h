@@ -158,27 +158,7 @@ int mnistLoad(mnist_data **pData, unsigned int *count, int vType)
 	return 0;
 }
 
-/*************************************************************************
-// DRAW THE CHARACTER
-int draw_label(mnist_data *pData, int idx)
-{
-    char pixel[1];
-    double val;
-    printf("label = %d:\n", pData[idx].label);  
-    for(int i = 0; i<28; i++){
-        for(int j = 0; j<28; j++){
-            val = pData[idx].data[i][j];
-            if ( val > .1) strcpy(pixel, "X");
-            else strcpy(pixel, " ");
-            printf("%s", pixel);
-        }
-        printf("\n");
-    }
-    
-    return 0;
-}
 
-/*************************************************************************/
 // CONVERT IMAGE DATA (28 X 28 PIXELS) INTO A SINGLE VECTOR
 // ALSO CONVERTS THE FLOATING POINT PIXELS INTO BINARY (ON/OFF) VALUES
 // ALSO ADDS A BIAS NODE TO THE BEGINNING OF THE VECTOR
