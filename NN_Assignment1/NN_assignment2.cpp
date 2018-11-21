@@ -6,7 +6,7 @@
 #define numOfInputNodes 785
 #define numOfOutputNodes 785
 #define numOfEpochs 5
-#define numOfHiddenLayers 10
+#define numOfHiddenLayers 11
 #define epochs 10
 
 
@@ -29,6 +29,7 @@ void weightsUpdate(float weightContainer[], int rows, int cols, float layer[], f
 
 void convertIntToFloat(float float_array[], int array[], int array_length);
 
+void drawTestOutput(float outputArr[]);
 
 using namespace std;
 
@@ -52,7 +53,7 @@ int main(int argc, char *argv[]) {
     unsigned int sizeData; // depends on loadType
     unsigned int sizeData2; // depends on loadType
 
-    int loadType = 1; // loadType may be: 0, 1, or 2
+    int loadType = 2; // loadType may be: 0, 1, or 2
     if (mnistLoad(&zData, &sizeData, loadType)) {
         printf("something went wrong loading data set\n");
         return -1;
@@ -61,12 +62,12 @@ int main(int argc, char *argv[]) {
     mnist_data *zData2;      // each image is 28x28 pixels
     unsigned int sizeData1;  // depends on loadType
     int loadType1 = 2; // loadType may be: 0, 1, or 2
-    if (mnistLoad(&zData1, &sizeData2, loadType1)) {
+    if (mnistLoad(&zData2, &sizeData2, loadType1)) {
         printf("something went wrong loading data set\n");
         return -1;
     }
 
-    float learningRate = .05;
+    float learningRate = 0.1;
 
     //    int pictureLabel = 6;
 
@@ -110,23 +111,48 @@ int main(int argc, char *argv[]) {
     }
 
 
+
     //training
 
-    for (int ep = 0; ep < epochs; ep++) {
+    for (int ep = 0; ep < 5; ep++) {
 
-        for (int test = 0; test < sizeData2; test++) {
+        //testing
+//        cout << "TESTING" << endl;
+//
+//        for (int picIndex = 0; picIndex < sizeData; picIndex++) {
+//
+//            get_input(inputArr, zData, picIndex, sampNoise);
+//
+//            createTarget(target, inputArr, zData[picIndex].label);
+//
+//            outputFromInput(hiddenLayerArr, inputArr, weightsInputHidden, numOfInputNodes, numOfHiddenLayers);
+//            squashingFunction(hiddenLayerArr, numOfHiddenLayers);
+//
+//            hiddenLayerArr[0] = 1;
+//
+//            outputCalculation(outputArr, hiddenLayerArr, weightsHiddenOutput, numOfHiddenLayers, numOfOutputNodes);
+//            squashingFunction(outputArr, numOfOutputNodes);
+//
+//
+//        }
 
-            get_input(inputArr, zData2, picIndex, sampNoise);
+        //learning
 
-            createTarget(target, inputArr, zData[picIndex].label);
+        for (int pic = 0; pic < sizeData2; pic++) {
+
+            get_input(inputArr, zData2, pic, sampNoise);
+
+            createTarget(target, inputArr, zData[pic].label);
 
             outputFromInput(hiddenLayerArr, inputArr, weightsInputHidden, numOfInputNodes, numOfHiddenLayers);
-
             squashingFunction(hiddenLayerArr, numOfHiddenLayers);
 
-            outputCalculation(outputArr, hiddenLayerArr, weightsHiddenOutput, numOfHiddenLayers, numOfOutputNodes);
+            hiddenLayerArr[0] = 1;
 
+            outputCalculation(outputArr, hiddenLayerArr, weightsHiddenOutput, numOfHiddenLayers, numOfOutputNodes);
             squashingFunction(outputArr, numOfOutputNodes);
+
+//            drawTestOutput(outputArr);
 
             calculateErrorForOutput(outputErrors, target, outputArr, numOfOutputNodes);
 
@@ -140,52 +166,6 @@ int main(int argc, char *argv[]) {
                           learningRate);
         }
 
-    }
-
-    //testing
-
-    for (int picIndex = 0; picIndex < sizeData; picIndex++) {
-
-        get_input(inputArr, zData, picIndex, sampNoise);
-
-        createTarget(target, inputArr, zData[picIndex].label);
-
-        outputFromInput(hiddenLayerArr, inputArr, weightsInputHidden, numOfInputNodes, numOfHiddenLayers);
-
-        squashingFunction(hiddenLayerArr, numOfHiddenLayers);
-
-        for (int i = 0; i < numOfHiddenLayers; i++) {
-            cout << "squashed hidden layer " << hiddenLayerArr[i] << endl;
-        }
-
-        outputCalculation(outputArr, hiddenLayerArr, weightsHiddenOutput, numOfHiddenLayers, numOfOutputNodes);
-
-        squashingFunction(outputArr, numOfOutputNodes);
-
-        for (int i = 0; i < 5; i++) {
-            cout << "squashed output layer " << outputArr[i] << endl;
-        }
-
-        calculateErrorForOutput(outputErrors, target, outputArr, numOfOutputNodes);
-
-        for (int i = 0; i < 5; i++) {
-            cout << "errors in output " << outputErrors[i] << endl;
-        }
-
-        calculateErrorForHidden(hiddenErrors, outputErrors, weightsHiddenOutput, hiddenLayerArr, numOfHiddenLayers,
-                                numOfOutputNodes);
-
-        for (int i = 0; i < numOfHiddenLayers; i++) {
-            cout << "errors in hidden layer " << hiddenErrors[i] << endl;
-        }
-
-        convertIntToFloat(inputLayerArr, inputArr, numOfInputNodes);
-
-        weightsUpdate(weightsHiddenOutput, numOfOutputNodes, numOfHiddenLayers, hiddenLayerArr, outputErrors,
-                      learningRate);
-
-        weightsUpdate(weightsInputHidden, numOfHiddenLayers, numOfInputNodes, inputLayerArr, hiddenErrors,
-                      learningRate);
     }
 
     return 0;
@@ -222,6 +202,7 @@ void outputCalculation(float outputLayer[], float inputLayer[], float weightsCon
             counter += weightsContainer[(i * inputLayerSize) + ii] * inputLayer[ii];
         }
         outputLayer[i] = counter;
+//        cout << "output[" << i << "] = " << outputLayer[i] << endl;
     }
 }
 
@@ -230,6 +211,7 @@ void outputCalculation(float outputLayer[], float inputLayer[], float weightsCon
 void squashingFunction(float resultOutput[], int arrayLength) {
     for (int i = 0; i < arrayLength; i++) {
         resultOutput[i] = 1.0 / (1.0 + exp(-1 * resultOutput[i]));
+//        cout << "squashed_output[" << i << "] = " << resultOutput[i] << endl;
     }
 }
 
@@ -238,6 +220,7 @@ void squashingFunction(float resultOutput[], int arrayLength) {
 void calculateErrorForOutput(float errorContainer[], float target[], float outputLayer[], int outputLayerSize) {
     for (int i = 0; i < outputLayerSize; i++) {
         errorContainer[i] = (target[i] - outputLayer[i]) * outputLayer[i] * (1 - outputLayer[i]);
+//        cout << "errorContainer[" << i << "] = " << errorContainer[i] << endl;
     }
 }
 
@@ -268,6 +251,8 @@ void weightsUpdate(float weightContainer[], int rows, int cols, float layer[], f
             deltaWeightArray[i * cols + j] = error[i] * layer[j] * learningRate;
 
             weightContainer[i * cols + j] += deltaWeightArray[i * cols + j];
+
+            cout << "weightContainer[" << i << "][" << j << "] = "  << weightContainer[i] << endl;
         }
     }
 }
@@ -277,4 +262,21 @@ void convertIntToFloat(float float_array[], int array[], int array_length) {
     for (int i = 0; i < array_length; i++) {
         float_array[i] = (float) array[i];
     }
+}
+
+void drawTestOutput(float outputArr[]) {
+
+    for (int i = 0; i < 28; i++) {
+        for (int j = 0; j < 28; j++) {
+
+            if ((outputArr[i * 28] + j + 1) >= 0.5) {
+                cout << "X";
+            } else {
+                cout << " ";
+            }
+        }
+        cout << endl;
+    }
+
+    cout << endl;
 }
