@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
 //            drawTestOutput(outputArr);
 
         }
-        cout << sum/sizeData << endl;
+        // cout << sum/sizeData << endl;
 
         //learning
 
