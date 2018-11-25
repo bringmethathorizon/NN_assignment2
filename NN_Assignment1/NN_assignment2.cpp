@@ -5,8 +5,8 @@
 
 #define numOfInputNodes 785
 #define numOfOutputNodes 785
-#define numOfHiddenLayers 11
-#define epochs 1000
+#define numOfHiddenLayers 10
+#define epochs 100
 
 
 void outputCalculation(float outputLayer[], float inputLayer[], float weightsContainer[], int inputLayerSize,
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     unsigned int sizeData; // depends on loadType
     unsigned int sizeData2; // depends on loadType
 
-    int loadType = 2; // loadType may be: 0, 1, or 2
+    int loadType = 1; // loadType may be: 0, 1, or 2
     if (mnistLoad(&zData, &sizeData, loadType)) {
         printf("something went wrong loading data set\n");
         return -1;
@@ -62,13 +62,13 @@ int main(int argc, char *argv[]) {
 
     mnist_data *zData2;      // each image is 28x28 pixels
     unsigned int sizeData1;  // depends on loadType
-    int loadType1 = 2; // loadType may be: 0, 1, or 2
+    int loadType1 = 0; // loadType may be: 0, 1, or 2
     if (mnistLoad(&zData2, &sizeData2, loadType1)) {
         printf("something went wrong loading data set\n");
         return -1;
     }
 
-    float learningRate = 0.01;
+    float learningRate = 0.05;
 
     //    int pictureLabel = 6;
 
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
 //            drawTestOutput(outputArr);
 
         }
-        // cout << sum/sizeData << endl;
+        cout << sum/sizeData << endl;
 
         //learning
 
@@ -175,7 +175,6 @@ int main(int argc, char *argv[]) {
 
             weightsUpdate(weightsHiddenOutput, numOfOutputNodes, numOfHiddenLayers, hiddenLayerArr, outputErrors,
                           learningRate);
-//            void weightsUpdate(float weightContainer[], int rows, int cols, float layer[], float error[], float learningRate)
 
             weightsUpdate(weightsInputHidden, numOfHiddenLayers, numOfInputNodes, inputLayerArr, hiddenErrors,
                           learningRate);
@@ -282,22 +281,22 @@ void convertIntToFloat(float float_array[], int array[], int array_length) {
     }
 }
 
-void drawTestOutput(float outputArr[]) {
-
-    for (int i = 0; i < 28; i++) {
-        for (int j = 0; j < 28; j++) {
-
-            if (outputArr[i * 28 + j + 1] >= 0.5) {
-                cout << "X";
-            } else {
-                cout << " ";
-            }
-        }
-        cout << endl;
-    }
-
-    cout << endl;
-}
+// void drawTestOutput(float outputArr[]) {
+//
+//     for (int i = 0; i < 28; i++) {
+//         for (int j = 0; j < 28; j++) {
+//
+//             if (outputArr[i * 28 + j + 1] >= 0.5) {
+//                 cout << "X";
+//             } else {
+//                 cout << " ";
+//             }
+//         }
+//         cout << endl;
+//     }
+//
+//     cout << endl;
+// }
 
 float calcAverageError (float target[], float outputContainer[], int length) {
     float sumOfErrors = 0;
