@@ -5,8 +5,8 @@
 
 #define numOfInputNodes 785
 #define numOfOutputNodes 785
-#define numOfHiddenLayers 10
-#define epochs 100
+#define numOfHiddenLayers 20
+#define epochs 10
 
 
 void outputCalculation(float outputLayer[], float inputLayer[], float weightsContainer[], int inputLayerSize,
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    float learningRate = 0.05;
+    float learningRate = 0.01;
 
     //    int pictureLabel = 6;
 
